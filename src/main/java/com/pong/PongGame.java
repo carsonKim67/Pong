@@ -17,10 +17,11 @@ public class PongGame extends JPanel implements MouseMotionListener {
     private SlowDown slow;
     private Speedup speedUp;
     private Paddle userPaddle;
+
     public PongGame() {
 
         aiPaddle = new Paddle(610, 240, 50, 9, Color.WHITE);
-        userPaddle = new Paddle(0, 240, 50, 9, Color.WHITE);
+        userPaddle = new Paddle(10, 240, 50, 9, Color.WHITE);
         JLabel pScore = new JLabel("0");
         JLabel aiScore = new JLabel("0");
         pScore.setBounds(280, 440, 20, 20);
@@ -31,9 +32,9 @@ public class PongGame extends JPanel implements MouseMotionListener {
         addMouseMotionListener(this);
         ball = new Ball(200, 200, 10, 3, Color.RED, 10);
 
-        //create any other objects necessary to play the game.
-        slow = new SlowDown(100,100,100,100);
-        speedUp = new Speedup(400,300,100,100);
+        // create any other objects necessary to play the game.
+        slow = new SlowDown(100, 100, 100, 100);
+        speedUp = new Speedup(400, 300, 100, 100);
     }
 
     // precondition: None
@@ -48,8 +49,8 @@ public class PongGame extends JPanel implements MouseMotionListener {
         return aiScore;
     }
 
-    //precondition: All visual components are initialized, non-null, objects 
-    //postcondition: A frame of the game is drawn onto the screen.
+    // precondition: All visual components are initialized, non-null, objects
+    // postcondition: A frame of the game is drawn onto the screen.
     public void paintComponent(Graphics g) {
 
         g.setColor(Color.BLACK);
@@ -62,7 +63,8 @@ public class PongGame extends JPanel implements MouseMotionListener {
         userPaddle.draw(g);
         slow.draw(g);
         speedUp.draw(g);
-        //call the "draw" function of any visual component you'd like to show up on the screen.
+        // call the "draw" function of any visual component you'd like to show up on the
+        // screen.
 
     }
 
@@ -70,25 +72,49 @@ public class PongGame extends JPanel implements MouseMotionListener {
     // values
     // postcondition: one frame of the game is "played"
     public void gameLogic() {
-        //add commands here to make the game play propperly
+        // add commands here to make the game play propperly
+        ball.bounceOffwalls(480, 0);
         ball.moveBall();
+        userPaddle.moveY(userMouseY);
         aiPaddle.moveY(ball.getY());
 
         if (aiPaddle.isTouching(ball)) {
-           ball.reverseX();
+            ball.reverseX();
         }
- 
-        pointScored();
+        if (userPaddle.isTouching(ball)) {
+            ball.reverseX();
+        }
+        if (ball.getX() >= width) {
+            ball.setChangey(3);
+            ball.setChangeX(10);
+            ball.setX(200);
+            ball.sety(200);
+            playerScore++;
+        }
+        if (ball.getX() <= 0){
+            ball.setChangey(3);
+            ball.setChangeX(10);
+            ball.setX(200);
+            ball.sety(200);
+            aiScore++;
+        }
 
-        if(slow.isTouching(ball)){
-            ball.setChangeX(ball.getChangeX()/2);
-            ball.setChangey(ball.getChangeY()/2);
+
+        if (slow.isTouching(ball)) {
+            if (ball.getChangeX() < 0) {
+                ball.setChangeX(ball.getChangeX() + .4);
+            } else {
+                ball.setChangeX(ball.getChangeX() - .4);
+            }
+           
         }
-        if(speedUp.isTouching(ball)){
-            ball.setChangeX(ball.getChangeX()*2);
-            ball.setChangey(ball.getChangeY()*2);
-        }
-    }
+        if (speedUp.isTouching(ball)) {
+            if (ball.getChangeX() < 0) {
+                ball.setChangeX(ball.getChangeX() - .4);
+            } else {
+                ball.setChangeX(ball.getChangeX() + .4);
+            }
+    }}
 
     // precondition: ball is a non-null object that exists in the world
     // postcondition: determines if either ai or the player score needs to be
@@ -96,10 +122,7 @@ public class PongGame extends JPanel implements MouseMotionListener {
     // the player scores if the ball moves off the right edge of the screen (640
     // pixels) and the ai scores
     // if the ball goes off the left edge (0)
-    public void pointScored() {
-
-    }
-
+   
     // you do not need to edit the below methods, but please do not remove them as
     // they are required for the program to run.
     @Override
