@@ -78,12 +78,21 @@ public class PongGame extends JPanel implements MouseMotionListener {
         userPaddle.moveY(userMouseY);
         aiPaddle.moveY(ball.getY());
 
+
         if (aiPaddle.isTouching(ball)) {
             ball.reverseX();
         }
         if (userPaddle.isTouching(ball)) {
+            if (ball.getY()> userPaddle.getY()+15){
+                ball.setChangey(ball.getChangeY()+1);
+            }
+                if((ball.getY()< userPaddle.getY()-15))
+                     { ball.setChangey(ball.getChangeY()-1);
+                    
+                }
             ball.reverseX();
         }
+        
         if (ball.getX() >= width) {
             ball.setChangey(3);
             ball.setChangeX(10);
@@ -99,15 +108,15 @@ public class PongGame extends JPanel implements MouseMotionListener {
             aiScore++;
         }
 
-
-        if (slow.isTouching(ball)) {
-            if (ball.getChangeX() < 0) {
-                ball.setChangeX(ball.getChangeX() + .4);
-            } else {
-                ball.setChangeX(ball.getChangeX() - .4);
+        if (ball.getChangeX() > 6){
+            if (slow.isTouching(ball)) {
+             if (ball.getChangeX() < 0) {
+                 ball.setChangeX(ball.getChangeX() + .4);
+                 } else {
+                     ball.setChangeX(ball.getChangeX() - .4);
             }
-           
-        }
+        }}
+        
         if (speedUp.isTouching(ball)) {
             if (ball.getChangeX() < 0) {
                 ball.setChangeX(ball.getChangeX() - .4);
