@@ -1,9 +1,13 @@
+//Carson Kim
+//12/3/2025
+//Pong Game Project - This project is a simple Pong game where the user plays against an AI paddle. The game includes features such as score tracking, ball speed adjustments, and a middle wall obstacle.
 package com.pong;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+
 
 public class PongGame extends JPanel implements MouseMotionListener {
     static int width = 640; // this is the amount of pixels to the right side of the screen
@@ -13,11 +17,14 @@ public class PongGame extends JPanel implements MouseMotionListener {
     private int playerScore;
     private int aiScore;
     private Ball ball;
-    // step 1 add any other private variables you may need to play the game.
+    //other initialized objects used in the game
     private SlowDown slow;
     private Speedup speedUp;
     private Paddle userPaddle;
+    private Wall middleWall;
 
+    // precondition: All visual components are initialized, non-null, objects
+    // postcondition: constructs a PongGame object that is ready to be played.
     public PongGame() {
 
         aiPaddle = new Paddle(610, 240, 50, 9, Color.WHITE);
@@ -31,6 +38,7 @@ public class PongGame extends JPanel implements MouseMotionListener {
         userMouseY = 0;
         addMouseMotionListener(this);
         ball = new Ball(200, 200, 10, 3, Color.RED, 10);
+        middleWall = new Wall(320,200,100,20,Color.BLUE);
 
         // create any other objects necessary to play the game.
         slow = new SlowDown(100, 100, 100, 100);
@@ -63,6 +71,7 @@ public class PongGame extends JPanel implements MouseMotionListener {
         userPaddle.draw(g);
         slow.draw(g);
         speedUp.draw(g);
+        middleWall.draw(g);
         // call the "draw" function of any visual component you'd like to show up on the
         // screen.
 
@@ -72,13 +81,19 @@ public class PongGame extends JPanel implements MouseMotionListener {
     // values
     // postcondition: one frame of the game is "played"
     public void gameLogic() {
-        // add commands here to make the game play propperly
+        //Makes ball bounce off walls and move as well as moving the paddles
         ball.bounceOffwalls(480, 0);
         ball.moveBall();
         userPaddle.moveY(userMouseY);
         aiPaddle.moveY(ball.getY());
 
-
+        //checks if ball is touching middle wall and reverses direction if so
+        if(ball.getX() >= middleWall.getX() && ball.getX() <= middleWall.getX()+20) {
+            if(ball.getY() >= middleWall.getY() && ball.getY() <= middleWall.getY()+100) {
+                ball.reverseX();
+            }
+        }
+        //checks if ball is touching either paddle and reverses direction if so
         if (aiPaddle.isTouching(ball)) {
             ball.reverseX();
         }
@@ -92,7 +107,7 @@ public class PongGame extends JPanel implements MouseMotionListener {
                 }
             ball.reverseX();
         }
-        
+        //checks if ball has gone off screen and updates score and resets ball if so
         if (ball.getX() >= width) {
             ball.setChangey(3);
             ball.setChangeX(10);
@@ -107,7 +122,7 @@ public class PongGame extends JPanel implements MouseMotionListener {
             ball.sety(200);
             aiScore++;
         }
-
+        //checks if ball is touching speed up or slow down objects and adjusts speed if so
         if (ball.getChangeX() > 6){
             if (slow.isTouching(ball)) {
              if (ball.getChangeX() < 0) {
